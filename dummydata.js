@@ -1,3 +1,5 @@
+import UploadScreen from "./src/screens/UploadScreen";
+
 const data = {
   imageURL:
     "https://i.pinimg.com/736x/d4/88/cb/d488cb23c186f6dc48752992e1b74018.jpg",

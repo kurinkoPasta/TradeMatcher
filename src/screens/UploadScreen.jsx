@@ -4,6 +4,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ActionSheetIOS,
+  TextInput,
+  ScrollView,
 } from "react-native";
 import { useState } from "react";
 import CustomText from "../components/CustomText";
@@ -20,13 +22,12 @@ const UploadScreen = () => {
         cancelButtonIndex: 0,
       },
       (buttonIndex) => {
-        if (buttonIndex === 0) {
-          pass;
-        } else if (buttonIndex === 1) {
+        if (buttonIndex === 1) {
           pickImage();
-        } else if (buttonIndex === 2) {
-          pass;
         }
+        // else if (buttonIndex === 2) {
+        //   pass;
+        // }
       }
     );
 
@@ -46,39 +47,68 @@ const UploadScreen = () => {
     }
   };
 
+  const [listingName, setListingName] = useState("");
+  const [listingDescription, setListingDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [clothingType, setClothingType] = useState("");
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <View>
-        <CustomText style={styles.headerTop}>New Listing</CustomText>
-      </View>
-      <TouchableOpacity onPress={handleAddImage} style={styles.pickImage}>
-        <Icon
-          name="camera"
-          size={35}
-          color="#ffffff"
-          style={styles.imageIcon}
-        />
-      </TouchableOpacity>
-      <View style={styles.smallSquare}>
-        <CustomText style={styles.label}>Listing name</CustomText>
-      </View>
-      <View style={styles.bigSquare}>
-        <CustomText style={styles.label}>Listing description</CustomText>
-      </View>
-      <View style={styles.smallSquare}>
-        <CustomText style={styles.label}>$</CustomText>
-      </View>
-      <View style={styles.smallSquare}>
-        <CustomText style={styles.label}>Clothing type</CustomText>
-      </View>
-      <View style={styles.smallSquare}>
-        <CustomText style={styles.label}>Size</CustomText>
-      </View>
-      <TouchableOpacity>
-        <View style={styles.btn}>
-          <CustomText style={styles.label}>Add listing</CustomText>
+      <ScrollView style={styles.scrollView}>
+        <View>
+          <CustomText style={styles.headerTop}>New Listing</CustomText>
         </View>
-      </TouchableOpacity>
+        <View style={styles.smallSquare}>
+          <TextInput
+            value={listingName}
+            placeholder="Listing name                                                       "
+            onChangeText={setListingName}
+            style={styles.textInput}
+          />
+        </View>
+        <View style={styles.bigSquare}>
+          <TextInput
+            value={listingDescription}
+            placeholder="Listing description                                                       "
+            onChangeText={setListingDescription}
+            style={styles.textInput}
+          />
+        </View>
+        <TouchableOpacity onPress={handleAddImage} style={styles.pickImage}>
+          <Icon
+            name="camera"
+            size={35}
+            color="#ffffff"
+            style={styles.imageIcon}
+          />
+        </TouchableOpacity>
+        <View style={styles.smallSquare}>
+          <TextInput
+            value={price}
+            placeholder="$                                                                            "
+            onChangeText={setPrice}
+            style={styles.textInput}
+          />
+        </View>
+        <View style={styles.smallSquare}>
+          <TextInput
+            value={clothingType}
+            placeholder="Clothing type                                                       "
+            onChangeText={setClothingType}
+            style={styles.textInput}
+          />
+        </View>
+        <TouchableOpacity>
+          <View style={styles.smallSquare}>
+            <CustomText style={styles.label}>Size</CustomText>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <View style={styles.btn}>
+            <CustomText style={styles.label}>Add listing</CustomText>
+          </View>
+        </TouchableOpacity>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -92,6 +122,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginTop: 8,
     textAlign: "center",
+    marginVertical: 15,
   },
   smallSquare: {
     flexDirection: "row",
@@ -101,7 +132,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "#EEEEEE",
     borderColor: "#EEEEEE",
-    marginVertical: 30,
+    marginVertical: 15,
   },
   label: {
     color: "#222222",
@@ -109,11 +140,11 @@ const styles = StyleSheet.create({
     marginLeft: 17,
   },
   bigSquare: {
-    alignItems: "center",
     justifyContent: "left",
     flexDirection: "row",
     borderRadius: 5,
-    paddingVertical: 70,
+    height: 100,
+    paddingTop: 10,
     marginHorizontal: 20,
     borderWidth: 1,
     backgroundColor: "#EEEEEE",
@@ -130,7 +161,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "#E1CFB9",
     borderColor: "#E1CFB9",
-    marginVertical: 90,
+    marginVertical: 30,
   },
   header: {
     backgroundColor: "#FFFFFF",
@@ -156,15 +187,21 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#ffffff",
-    borderRadius: 10,
   },
   pickImage: {
-    width: 100,
-    height: 100,
+    width: 130,
+    height: 130,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#DDDDDD",
+    backgroundColor: "#EEEEEE",
+    marginHorizontal: 20,
+    marginVertical: 15,
+    borderRadius: 5,
+  },
+  textInput: {
+    fontSize: 16,
+    lineHeight: 20,
+    marginLeft: 17,
+    fontFamily: "Times New Roman",
   },
 });

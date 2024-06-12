@@ -4,16 +4,17 @@ import {
   SafeAreaView,
   StyleSheet,
   View,
-  Text,
-  Pressable,
+  TouchableOpacity,
 } from "react-native";
 import React from "react";
 import { data } from "../../dummydata";
 import CustomText from "../components/CustomText";
+import Icon from "react-native-vector-icons/FontAwesome6";
 
 const windowWidth = Dimensions.get("window").width;
 
-const ItemListingScreen = () => {
+const ProductScreen = () => {
+  const handleLiked = () => {};
   return (
     <View>
       <Image source={{ uri: data.imageURL }} style={styles.img} />
@@ -30,16 +31,28 @@ const ItemListingScreen = () => {
         {"\n"}
       </CustomText>
       <CustomText style={styles.body}>{data.size}</CustomText>
-      <Pressable onPress={() => {}}>
-        <View style={styles.btn}>
-          <CustomText style={styles.btnText}>Buy</CustomText>
-        </View>
-      </Pressable>
+      <View style={styles.btnContainer}>
+        <TouchableOpacity onPress={handleLiked}>
+          <View style={styles.likeBtn}>
+            <Icon
+              name="heart"
+              size={20}
+              color="#ffffff"
+              style={styles.imageIcon}
+            />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <View style={styles.btn}>
+            <CustomText style={styles.btnText}>Buy</CustomText>
+          </View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
-export default ItemListingScreen;
+export default ProductScreen;
 
 const styles = StyleSheet.create({
   img: { width: windowWidth, height: windowWidth + 35 },
@@ -60,16 +73,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 5,
-    paddingVertical: 10,
-    marginHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 130,
     borderWidth: 1,
     backgroundColor: "#E1CFB9",
     borderColor: "#E1CFB9",
+    marginHorizontal: 50,
+    marginVertical: 140,
+    marginLeft: 20,
+  },
+  likeBtn: {
+    flexDirection: "row",
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    backgroundColor: "#E1CFB9",
+    borderColor: "#E1CFB9",
+    marginLeft: 20,
+    alignContent: "center",
+    justifyContent: "center",
     marginVertical: 140,
   },
   btnText: {
     fontSize: 18,
     lineHeight: 26,
     color: "#333333",
+  },
+  imageIcon: {
+    opacity: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  btnContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
