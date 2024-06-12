@@ -1,5 +1,10 @@
 import Navigation from "./src/utils/Navigation";
+import { ContextProvider } from "./src/utils/context";
 
 export default function App() {
-  return <Navigation />;
+  return (
+    <ContextProvider>
+      <Navigation />
+    </ContextProvider>
+  );
 }
