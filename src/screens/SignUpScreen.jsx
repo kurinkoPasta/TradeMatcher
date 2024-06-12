@@ -4,8 +4,10 @@ import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { auth } from "../utils/firebase";
 import { createUserWithEmailAndPassword } from "@firebase/auth";
+import { useNavigation } from "@react-navigation/native";
 
 const SignUpScreen = () => {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,6 +23,9 @@ const SignUpScreen = () => {
         const errorMessage = error.message;
         console.log("Error signing up");
       });
+  };
+  const goToSignIn = () => {
+    navigation.navigate("SignIn");
   };
   return (
     <SafeAreaView>
@@ -56,6 +61,12 @@ const SignUpScreen = () => {
           <CustomText style={styles.btnText}>Sign up</CustomText>
         </View>
       </TouchableOpacity>
+      <View>
+        <CustomText style={styles.btnText}>Already have an account?</CustomText>
+        <TouchableOpacity onPress={goToSignIn}>
+          <CustomText style={styles.textUnderline}>Sign in</CustomText>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -110,5 +121,12 @@ const styles = StyleSheet.create({
     color: "#000000",
     textAlign: "center",
     marginBottom: 30,
+  },
+  textUnderline: {
+    fontSize: 16,
+    lineHeight: 0,
+    color: "#000000",
+    textAlign: "center",
+    textDecorationLine: "underline",
   },
 });

@@ -1,10 +1,19 @@
-import { createContext, useContext } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "./firebase";
 
 const Context = createContext();
 
 const ContextProvider = ({ children }) => {
-  const user = "akari";
-  return <Context.Provider value={{ user }}>{children}</Context.Provider>;
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+    });
+  }, []);
+  return (
+    <Context.Provider value={{ isAuthenticated }}>{children}</Context.Provider>
+  );
 };
 
 const useGlobalContext = () => useContext(Context);

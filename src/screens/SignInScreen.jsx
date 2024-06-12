@@ -10,11 +10,8 @@ import { auth } from "../utils/firebase";
 import { useState } from "react";
 import CustomText from "../components/CustomText";
 import { useNavigation } from "@react-navigation/native";
-import { useGlobalContext } from "../utils/context";
 
 const SignInScreen = () => {
-  const { user } = useGlobalContext();
-  console.log(user);
   const navigation = useNavigation();
 
   const [email, setEmail] = useState("");

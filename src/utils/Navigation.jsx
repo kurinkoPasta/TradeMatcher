@@ -9,6 +9,7 @@ import GalleryScreen from "../screens/GalleryScreen";
 import Icon from "react-native-vector-icons/FontAwesome6";
 import ProductScreen from "../screens/ProductScreen";
 import WishListScreen from "../screens/WishListScreen";
+import SplashScreen from "../screens/SplashScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -58,6 +59,7 @@ const Navigation = () => {
           headerShown: false,
         }}
       >
+        <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="SignIn" component={SignInScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="Product" component={ProductScreen} />
