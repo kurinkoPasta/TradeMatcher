@@ -17,7 +17,9 @@ const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={{ headerShown: false, tabBarActiveTintColor: "#E1CFB9" }}
+    >
       <Tab.Screen
         name="Gallery"
         component={GalleryScreen}
@@ -34,7 +36,7 @@ const Tabs = () => {
         options={{
           tabBarLabel: "Upload",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="arrow-up" size={size} color={color} />
+            <Icon name="square-plus" size={size} color={color} solid />
           ),
         }}
       />

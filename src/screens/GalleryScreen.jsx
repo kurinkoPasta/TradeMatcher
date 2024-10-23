@@ -4,6 +4,7 @@ import {
   TextInput,
   View,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { useState } from "react";
 import CustomText from "../components/CustomText";
@@ -11,6 +12,27 @@ import RNPickerSelect from "react-native-picker-select";
 import Gallery from "../components/Gallery";
 import { useGlobalContext } from "../utils/context";
 import { auth } from "../utils/firebase";
+
+const getFilteredListings = (listings, tradeSelected) => {
+  if (tradeSelected) {
+    const currUserItems = listings.filter(
+      (listingItem) => listingItem.userId === auth.currentUser?.uid
+    );
+    const likedByUsers = currUserItems
+      .map((listingItem) => listingItem.likedBy)
+      .flat();
+    const likedByUsersUnique = [...new Set(likedByUsers)];
+    const likedByUsersItems = listings.filter((listingItem) =>
+      likedByUsersUnique.includes(listingItem.userId)
+    );
+    return likedByUsersItems;
+  } else {
+    const filteredItems = listings.filter(
+      (listingItem) => listingItem.userId !== auth.currentUser?.uid
+    );
+    return filteredItems;
+  }
+};
 
 const GalleryScreen = () => {
   const clothingTypeSize = {
@@ -44,31 +66,31 @@ const GalleryScreen = () => {
   const [clothingType, setClothingType] = useState("");
   const [size, setSize] = useState("");
   const [price, setPrice] = useState("");
+  const [tradeSelected, setTradeSelected] = useState(true);
+
+  const filteredListings = getFilteredListings(listings, tradeSelected);
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <CustomText style={styles.header}>Discover</CustomText>
         <View>
-          <View style={styles.smallSquare}>
-            <TextInput
-              value={search}
-              placeholder="Search                                                                      "
-              onChangeText={setSearch}
-              style={styles.textInput}
-            />
-          </View>
+          <TextInput
+            value={search}
+            placeholder="Search                                                                      "
+            onChangeText={setSearch}
+            style={styles.textInput}
+          />
           <View style={styles.filterContainer}>
-            <RNPickerSelect
-              style={pickerSelectStyles}
-              placeholder={{ label: "Size", value: "" }}
-              onValueChange={(value) => setSize(value)}
-              items={
-                clothingType in clothingTypeSize
-                  ? clothingTypeSize[clothingType]
-                  : clothingTypeSize.other
-              }
-            />
+            <TouchableOpacity
+              style={[
+                pickerSelectStyles.inputIOS,
+                tradeSelected && styles.tradeSelected,
+              ]}
+              onPress={() => setTradeSelected(!tradeSelected)}
+            >
+              <CustomText style={styles.tradeBtnText}>Trade</CustomText>
+            </TouchableOpacity>
             <RNPickerSelect
               style={pickerSelectStyles}
               placeholder={{ label: "Type", value: "" }}
@@ -84,6 +106,16 @@ const GalleryScreen = () => {
                 { label: "Accessories", value: "accessories" },
                 { label: "Other", value: "other" },
               ]}
+            />
+            <RNPickerSelect
+              style={pickerSelectStyles}
+              placeholder={{ label: "Size", value: "" }}
+              onValueChange={(value) => setSize(value)}
+              items={
+                clothingType in clothingTypeSize
+                  ? clothingTypeSize[clothingType]
+                  : clothingTypeSize.other
+              }
             />
             <RNPickerSelect
               style={pickerSelectStyles}
@@ -104,11 +136,7 @@ const GalleryScreen = () => {
               ]}
             />
           </View>
-          <Gallery
-            listings={listings.filter(
-              (listingItem) => listingItem.userId !== auth.currentUser?.uid
-            )}
-          />
+          <Gallery listings={filteredListings ? filteredListings : []} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -118,6 +146,9 @@ const GalleryScreen = () => {
 export default GalleryScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   header: {
     color: "#000000",
     fontSize: 30,
@@ -125,33 +156,27 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   textInput: {
-    fontSize: 20,
-    lineHeight: 26,
-    marginLeft: 17,
+    fontSize: 18,
+    marginHorizontal: 20,
     fontFamily: "Times New Roman",
     color: "#000000",
-  },
-  smallSquare: {
-    flexDirection: "row",
     borderRadius: 5,
     paddingVertical: 10,
-    marginHorizontal: 20,
-    borderWidth: 1,
-    backgroundColor: "#EEEEEE",
-    borderColor: "#EEEEEE",
+    backgroundColor: "#DDDDDD",
     marginVertical: 10,
+    paddingHorizontal: 10,
   },
   filterContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginHorizontal: 20,
   },
-  imgContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  tradeBtnText: {
+    fontSize: 16,
+    textAlign: "center",
   },
-  container: {
-    flex: 1,
+  tradeSelected: {
+    backgroundColor: "#E1CFB9",
   },
 });
 
@@ -160,8 +185,8 @@ const pickerSelectStyles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 10,
     marginBottom: 10,
-    backgroundColor: "#EEEEEE",
-    width: 100,
+    backgroundColor: "#DDDDDD",
+    width: 75,
     fontSize: 16,
     lineHeight: 0,
     color: "#000000",
