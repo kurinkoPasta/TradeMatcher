@@ -10,6 +10,7 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 import ProductScreen from "../screens/ProductScreen";
 import WishListScreen from "../screens/WishListScreen";
 import SplashScreen from "../screens/SplashScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,7 +44,7 @@ const Tabs = () => {
         options={{
           tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
-            <Icon name="user" size={size} color={color} />
+            <Icon name="user" size={size} color={color} solid />
           ),
         }}
       />
@@ -64,6 +65,7 @@ const Navigation = () => {
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="Product" component={ProductScreen} />
         <Stack.Screen name="Wishlist" component={WishListScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="Home" component={Tabs} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -5,6 +5,8 @@ import {
   getReactNativePersistence,
 } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBg1iujqtLCgzzAuQJAawt5yGsp3uzQDz8",
@@ -20,5 +22,6 @@ const app = initializeApp(firebaseConfig);
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
-
-export { auth };
+const db = getFirestore(app);
+const storage = getStorage(app, "gs://tradematcher-918dd.appspot.com");
+export { auth, db, storage };

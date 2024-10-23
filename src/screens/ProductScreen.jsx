@@ -13,41 +13,39 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 
 const windowWidth = Dimensions.get("window").width;
 
-const ProductScreen = () => {
+const ProductScreen = ({ route }) => {
+  const { listing } = route.params;
   const handleLiked = () => {};
   return (
-    <View>
-      <Image source={{ uri: data.imageURL }} style={styles.img} />
+    <View style={styles.container}>
+      <Image source={{ uri: listing.image }} style={styles.img} />
       <CustomText style={styles.header}>
-        ${data.price} {data.name}
+        ${listing.price} {listing.name}
       </CustomText>
       <CustomText style={styles.body}>
-        @{data.username}
+        @{listing.userName}
         {"\n"}
         {"\n"}
       </CustomText>
       <CustomText style={styles.body}>
-        {data.description}
+        {listing.description}
         {"\n"}
       </CustomText>
-      <CustomText style={styles.body}>{data.size}</CustomText>
+      <CustomText style={styles.body}>Size: {listing.size}</CustomText>
       <View style={styles.btnContainer}>
-        <TouchableOpacity onPress={handleLiked}>
-          <View style={styles.likeBtn}>
-            <Icon
-              name="heart"
-              size={20}
-              color="#ffffff"
-              style={styles.imageIcon}
-            />
-          </View>
+        <TouchableOpacity onPress={handleLiked} style={styles.likeBtn}>
+          <Icon
+            name="heart"
+            size={20}
+            color="#ffffff"
+            style={styles.imageIcon}
+          />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <View style={styles.btn}>
-            <CustomText style={styles.btnText}>Buy</CustomText>
-          </View>
+        <TouchableOpacity style={styles.buyBtn}>
+          <CustomText style={styles.btnText}>Buy • ${listing.price}</CustomText>
         </TouchableOpacity>
       </View>
+      <SafeAreaView />
     </View>
   );
 };
@@ -55,6 +53,9 @@ const ProductScreen = () => {
 export default ProductScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   img: { width: windowWidth, height: windowWidth + 35 },
   header: {
     color: "#000000",
@@ -68,37 +69,24 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginLeft: 20,
   },
-  btn: {
-    flexDirection: "row",
-    alignItems: "center",
+  buyBtn: {
+    flex: 1,
     justifyContent: "center",
     borderRadius: 5,
     paddingVertical: 8,
-    paddingHorizontal: 130,
-    borderWidth: 1,
     backgroundColor: "#E1CFB9",
-    borderColor: "#E1CFB9",
-    marginHorizontal: 50,
-    marginVertical: 140,
     marginLeft: 20,
   },
   likeBtn: {
-    flexDirection: "row",
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 10,
-    borderWidth: 1,
     backgroundColor: "#E1CFB9",
-    borderColor: "#E1CFB9",
-    marginLeft: 20,
-    alignContent: "center",
-    justifyContent: "center",
-    marginVertical: 140,
   },
   btnText: {
     fontSize: 18,
-    lineHeight: 26,
-    color: "#333333",
+    color: "#FFFFFF",
+    textAlign: "center",
   },
   imageIcon: {
     opacity: 1,
@@ -108,5 +96,7 @@ const styles = StyleSheet.create({
   btnContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: "auto",
+    marginHorizontal: 20,
   },
 });

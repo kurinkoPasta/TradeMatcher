@@ -11,9 +11,42 @@ import { useState } from "react";
 import CustomText from "../components/CustomText";
 import Icon from "react-native-vector-icons/FontAwesome6";
 import * as ImagePicker from "expo-image-picker";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { auth, db, storage } from "../utils/firebase";
+import RNPickerSelect from "react-native-picker-select";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
-const UploadScreen = () => {
-  const [image, setImage] = useState(null);
+const UploadScreen = ({ navigation }) => {
+  const clothingTypeSize = {
+    footwear: [
+      { label: "24", value: "24" },
+      { label: "24.5", value: "24.5" },
+      { label: "25", value: "25" },
+      { label: "25.5", value: "25.5" },
+      { label: "26", value: "26" },
+      { label: "26.5", value: "26.5" },
+      { label: "27", value: "27" },
+      { label: "27.5", value: "27.5" },
+      { label: "28", value: "28" },
+      { label: "28.5", value: "28.5" },
+      { label: "29", value: "29" },
+      { label: "29.5", value: "29.5" },
+      { label: "30", value: "30" },
+    ],
+    other: [
+      { label: "XS", value: "XS" },
+      { label: "S", value: "S" },
+      { label: "M", value: "M" },
+      { label: "L", value: "L" },
+      { label: "XL", value: "XL" },
+    ],
+  };
+  const [image, setImage] = useState("");
+  const [listingName, setListingName] = useState("");
+  const [listingDescription, setListingDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [clothingType, setClothingType] = useState("");
+  const [size, setSize] = useState("");
 
   const handleAddImage = () =>
     ActionSheetIOS.showActionSheetWithOptions(
@@ -47,10 +80,25 @@ const UploadScreen = () => {
     }
   };
 
-  const [listingName, setListingName] = useState("");
-  const [listingDescription, setListingDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [clothingType, setClothingType] = useState("");
+  const handleAddListing = async () => {
+    const listingRef = doc(collection(db, "listings"));
+    const res = await fetch(image);
+    const blob = await res.blob();
+    const imageRef = ref(storage, i);
+    await uploadBytes(imageRef, blob);
+    const url = await getDownloadURL(imageRef);
+    setDoc(listingRef, {
+      name: listingName,
+      description: listingDescription,
+      price,
+      clothingType,
+      size,
+      image: url,
+      userId: auth.currentUser.uid,
+      userName: auth.currentUser.email.split("@")[0],
+    });
+    navigation.navigate("Profile");
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
@@ -58,22 +106,19 @@ const UploadScreen = () => {
         <View>
           <CustomText style={styles.headerTop}>New Listing</CustomText>
         </View>
-        <View style={styles.smallSquare}>
-          <TextInput
-            value={listingName}
-            placeholder="Listing name                                                       "
-            onChangeText={setListingName}
-            style={styles.textInput}
-          />
-        </View>
-        <View style={styles.bigSquare}>
-          <TextInput
-            value={listingDescription}
-            placeholder="Listing description                                                       "
-            onChangeText={setListingDescription}
-            style={styles.textInput}
-          />
-        </View>
+        <TextInput
+          value={listingName}
+          placeholder="Listing name"
+          onChangeText={setListingName}
+          style={styles.textInput}
+        />
+        <TextInput
+          value={listingDescription}
+          placeholder="Listing description"
+          multiline
+          onChangeText={setListingDescription}
+          style={[styles.textInput, styles.multiLine]}
+        />
         <TouchableOpacity onPress={handleAddImage} style={styles.pickImage}>
           <Icon
             name="camera"
@@ -82,31 +127,40 @@ const UploadScreen = () => {
             style={styles.imageIcon}
           />
         </TouchableOpacity>
-        <View style={styles.smallSquare}>
-          <TextInput
-            value={price}
-            placeholder="$                                                                            "
-            onChangeText={setPrice}
-            style={styles.textInput}
-          />
-        </View>
-        <View style={styles.smallSquare}>
-          <TextInput
-            value={clothingType}
-            placeholder="Clothing type                                                       "
-            onChangeText={setClothingType}
-            style={styles.textInput}
-          />
-        </View>
-        <TouchableOpacity>
-          <View style={styles.smallSquare}>
-            <CustomText style={styles.label}>Size</CustomText>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <View style={styles.btn}>
-            <CustomText style={styles.label}>Add listing</CustomText>
-          </View>
+        <TextInput
+          value={price}
+          placeholder="$"
+          onChangeText={setPrice}
+          style={styles.textInput}
+        />
+        <RNPickerSelect
+          style={pickerSelectStyles}
+          placeholder={{ label: "Clothing type", value: "" }}
+          onValueChange={(value) => setClothingType(value)}
+          items={[
+            { label: "Footwear", value: "footwear" },
+            { label: "Shirt", value: "shirt" },
+            { label: "Sweater", value: "sweater" },
+            { label: "Shorts", value: "shorts" },
+            { label: "Pants", value: "pants" },
+            { label: "Dress", value: "dress" },
+            { label: "Skirt", value: "skirt" },
+            { label: "Accessories", value: "accessories" },
+            { label: "Other", value: "other" },
+          ]}
+        />
+        <RNPickerSelect
+          style={pickerSelectStyles}
+          placeholder={{ label: "Size", value: "" }}
+          onValueChange={(value) => setSize(value)}
+          items={
+            clothingType in clothingTypeSize
+              ? clothingTypeSize[clothingType]
+              : clothingTypeSize.other
+          }
+        />
+        <TouchableOpacity style={styles.btn} onPress={handleAddListing}>
+          <CustomText style={styles.label}>Add listing</CustomText>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -119,37 +173,13 @@ const styles = StyleSheet.create({
   headerTop: {
     color: "#000000",
     fontSize: 30,
-    marginLeft: 20,
     marginTop: 8,
     textAlign: "center",
-    marginVertical: 15,
-  },
-  smallSquare: {
-    flexDirection: "row",
-    borderRadius: 5,
-    paddingVertical: 10,
-    marginHorizontal: 20,
-    borderWidth: 1,
-    backgroundColor: "#EEEEEE",
-    borderColor: "#EEEEEE",
     marginVertical: 15,
   },
   label: {
     color: "#222222",
     fontSize: 16,
-    marginLeft: 17,
-  },
-  bigSquare: {
-    justifyContent: "left",
-    flexDirection: "row",
-    borderRadius: 5,
-    height: 100,
-    paddingTop: 10,
-    marginHorizontal: 20,
-    borderWidth: 1,
-    backgroundColor: "#EEEEEE",
-    borderColor: "#EEEEEE",
-    marginVertical: 0,
   },
   btn: {
     flexDirection: "row",
@@ -200,8 +230,38 @@ const styles = StyleSheet.create({
   },
   textInput: {
     fontSize: 16,
-    lineHeight: 20,
-    marginLeft: 17,
+    marginHorizontal: 17,
     fontFamily: "Times New Roman",
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: "#EEEEEE",
+    marginVertical: 15,
+  },
+  multiLine: {
+    height: 100,
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    marginHorizontal: 17,
+    fontFamily: "Times New Roman",
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: "#EEEEEE",
+    marginVertical: 15,
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: "purple",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30,
   },
 });
