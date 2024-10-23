@@ -9,12 +9,23 @@ import {
 import React from "react";
 import CustomText from "../components/CustomText";
 import Icon from "react-native-vector-icons/FontAwesome6";
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../utils/firebase";
+import { useGlobalContext } from "../utils/context";
 
 const windowWidth = Dimensions.get("window").width;
 
 const ProductScreen = ({ route }) => {
-  const { listing } = route.params;
-  const handleLiked = () => {};
+  const { listingId } = route.params;
+  const { listings } = useGlobalContext();
+  const listing = listings.find((listingItem) => listingItem.id === listingId);
+  const handleLiked = () => {
+    updateDoc(doc(db, `listings/${listing.id}`), {
+      likedBy: listing.likedBy.includes(auth.currentUser.uid)
+        ? arrayRemove(auth.currentUser.uid)
+        : arrayUnion(auth.currentUser.uid),
+    });
+  };
   return (
     <View style={styles.container}>
       <Image source={{ uri: listing.image }} style={styles.img} />
@@ -38,6 +49,7 @@ const ProductScreen = ({ route }) => {
             size={20}
             color="#ffffff"
             style={styles.imageIcon}
+            solid={listing.likedBy.includes(auth.currentUser.uid)}
           />
         </TouchableOpacity>
         <TouchableOpacity style={styles.buyBtn}>

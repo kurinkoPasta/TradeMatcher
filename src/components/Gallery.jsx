@@ -13,13 +13,16 @@ const windowHalfWidth = Dimensions.get("window").width / 2;
 const Gallery = ({ listings }) => {
   const navigation = useNavigation();
 
-  const goToProduct = (listing) => {
-    navigation.navigate("Product", { listing });
+  const goToProduct = (listingId) => {
+    navigation.navigate("Product", { listingId });
   };
   return (
     <View style={styles.gallery}>
       {listings.map((listing) => (
-        <TouchableOpacity onPress={() => goToProduct(listing)} key={listing.id}>
+        <TouchableOpacity
+          onPress={() => goToProduct(listing.id)}
+          key={listing.id}
+        >
           <Image source={{ uri: listing.image }} style={styles.img} />
           <CustomText style={styles.subheader}>
             ${listing.price} {listing.name}
