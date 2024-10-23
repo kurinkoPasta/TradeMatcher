@@ -1,21 +1,16 @@
 import {
-  Dimensions,
-  Image,
   SafeAreaView,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   View,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { data } from "../../dummydata";
+import { useState } from "react";
 import CustomText from "../components/CustomText";
-import { useNavigation } from "@react-navigation/native";
-import { collection, doc, getDocs } from "firebase/firestore";
-import { auth, db } from "../utils/firebase";
 import RNPickerSelect from "react-native-picker-select";
 import Gallery from "../components/Gallery";
+import { useGlobalContext } from "../utils/context";
+import { auth } from "../utils/firebase";
 
 const GalleryScreen = () => {
   const clothingTypeSize = {
@@ -42,22 +37,13 @@ const GalleryScreen = () => {
       { label: "XL", value: "XL" },
     ],
   };
-  const navigation = useNavigation();
+
+  const { listings } = useGlobalContext();
+
   const [search, setSearch] = useState("");
-  const [listings, setListings] = useState([]);
   const [clothingType, setClothingType] = useState("");
   const [size, setSize] = useState("");
   const [price, setPrice] = useState("");
-  useEffect(() => {
-    (async () => {
-      setListings(
-        (await getDocs(collection(db, "listings"))).docs.map((snap) => ({
-          ...snap.data(),
-          id: snap.id,
-        }))
-      );
-    })();
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -118,7 +104,11 @@ const GalleryScreen = () => {
               ]}
             />
           </View>
-          <Gallery listings={listings} />
+          <Gallery
+            listings={listings.filter(
+              (listingItem) => listingItem.userId !== auth.currentUser.uid
+            )}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

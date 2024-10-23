@@ -5,38 +5,21 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import CustomText from "../components/CustomText";
 import Icon from "react-native-vector-icons/FontAwesome6";
-import { auth, db } from "../utils/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { auth } from "../utils/firebase";
 import Gallery from "../components/Gallery";
+import { useGlobalContext } from "../utils/context";
 
 const ProfileScreen = ({ navigation }) => {
-  const [listings, setListings] = useState([]);
+  const { listings } = useGlobalContext();
   const goToWishList = () => {
     navigation.navigate("Wishlist");
   };
   const goToSettings = () => {
     navigation.navigate("Settings");
   };
-  useEffect(() => {
-    (async () => {
-      setListings(
-        (
-          await getDocs(
-            query(
-              collection(db, "listings"),
-              where("userId", "==", auth.currentUser.uid)
-            )
-          )
-        ).docs.map((snap) => ({
-          ...snap.data(),
-          id: snap.id,
-        }))
-      );
-    })();
-  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
@@ -52,7 +35,11 @@ const ProfileScreen = ({ navigation }) => {
           <CustomText style={styles.header}>
             @{auth.currentUser.email.split("@")[0]}
           </CustomText>
-          <Gallery listings={listings} />
+          <Gallery
+            listings={listings.filter(
+              (listingItem) => listingItem.userId === auth.currentUser.uid
+            )}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
