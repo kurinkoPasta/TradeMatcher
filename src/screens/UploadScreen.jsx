@@ -6,6 +6,8 @@ import {
   ActionSheetIOS,
   TextInput,
   ScrollView,
+  Image,
+  ActivityIndicator,
 } from "react-native";
 import { useState } from "react";
 import CustomText from "../components/CustomText";
@@ -14,7 +16,12 @@ import * as ImagePicker from "expo-image-picker";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { auth, db, storage } from "../utils/firebase";
 import RNPickerSelect from "react-native-picker-select";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import {
+  getDownloadURL,
+  ref,
+  uploadBytes,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 const UploadScreen = ({ navigation }) => {
   const clothingTypeSize = {
@@ -47,6 +54,7 @@ const UploadScreen = ({ navigation }) => {
   const [price, setPrice] = useState("");
   const [clothingType, setClothingType] = useState("");
   const [size, setSize] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleAddImage = () =>
     ActionSheetIOS.showActionSheetWithOptions(
@@ -73,19 +81,18 @@ const UploadScreen = ({ navigation }) => {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
 
   const handleAddListing = async () => {
+    setLoading(true);
     const listingRef = doc(collection(db, "listings"));
     const res = await fetch(image);
     const blob = await res.blob();
-    const imageRef = ref(storage, i);
-    await uploadBytes(imageRef, blob);
+    const imageRef = ref(storage, `${listingRef.id}.jpg`);
+    await uploadBytesResumable(imageRef, blob);
     const url = await getDownloadURL(imageRef);
     setDoc(listingRef, {
       name: listingName,
@@ -96,7 +103,9 @@ const UploadScreen = ({ navigation }) => {
       image: url,
       userId: auth.currentUser.uid,
       userName: auth.currentUser.email.split("@")[0],
+      likedBy: [],
     });
+    setLoading(false);
     navigation.navigate("Profile");
   };
 
@@ -120,12 +129,16 @@ const UploadScreen = ({ navigation }) => {
           style={[styles.textInput, styles.multiLine]}
         />
         <TouchableOpacity onPress={handleAddImage} style={styles.pickImage}>
-          <Icon
-            name="camera"
-            size={35}
-            color="#ffffff"
-            style={styles.imageIcon}
-          />
+          {image ? (
+            <Image source={{ uri: image }} style={styles.image} />
+          ) : (
+            <Icon
+              name="camera"
+              size={35}
+              color="#ffffff"
+              style={styles.imageIcon}
+            />
+          )}
         </TouchableOpacity>
         <TextInput
           value={price}
@@ -159,8 +172,19 @@ const UploadScreen = ({ navigation }) => {
               : clothingTypeSize.other
           }
         />
-        <TouchableOpacity style={styles.btn} onPress={handleAddListing}>
-          <CustomText style={styles.label}>Add listing</CustomText>
+        <TouchableOpacity
+          disabled={loading}
+          style={[styles.btn, loading && styles.uploadingBtn]}
+          onPress={handleAddListing}
+        >
+          {loading ? (
+            <View style={styles.uploadingBtnTxt}>
+              <ActivityIndicator style={styles.activityIndicator} />
+              <CustomText style={styles.label}>Uploading</CustomText>
+            </View>
+          ) : (
+            <CustomText style={styles.label}>Add listing</CustomText>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -227,6 +251,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 15,
     borderRadius: 5,
+    overflow: "hidden",
+  },
+  image: {
+    width: 130,
+    height: 130,
   },
   textInput: {
     fontSize: 16,
@@ -240,6 +269,17 @@ const styles = StyleSheet.create({
   },
   multiLine: {
     height: 100,
+  },
+  uploadingBtnTxt: {
+    flexDirection: "row",
+  },
+  uploadingBtn: {
+    backgroundColor: "#CCCCCC",
+    alignItems: "center",
+  },
+  activityIndicator: {
+    marginRight: 10,
+    color: "black",
   },
 });
 

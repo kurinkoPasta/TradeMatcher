@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "./firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 
 const Context = createContext();
 
@@ -13,11 +13,13 @@ const ContextProvider = ({ children }) => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       setIsAuthenticated(!!user);
       if (!!user)
-        setListings(
-          (await getDocs(collection(db, "listings"))).docs.map((snap) => ({
-            ...snap.data(),
-            id: snap.id,
-          }))
+        onSnapshot(collection(db, "listings"), async (snap) =>
+          setListings(
+            snap.docs.map((doc) => ({
+              ...doc.data(),
+              id: doc.id,
+            }))
+          )
         );
     });
   }, []);

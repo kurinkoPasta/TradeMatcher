@@ -106,7 +106,7 @@ const GalleryScreen = () => {
           </View>
           <Gallery
             listings={listings.filter(
-              (listingItem) => listingItem.userId !== auth.currentUser.uid
+              (listingItem) => listingItem.userId !== auth.currentUser?.uid
             )}
           />
         </View>

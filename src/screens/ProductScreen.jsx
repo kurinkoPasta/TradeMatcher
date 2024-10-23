@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React from "react";
-import { data } from "../../dummydata";
 import CustomText from "../components/CustomText";
 import Icon from "react-native-vector-icons/FontAwesome6";
 
