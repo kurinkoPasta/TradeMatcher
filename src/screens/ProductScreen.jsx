@@ -19,6 +19,8 @@ const ProductScreen = ({ route }) => {
   const { listingId } = route.params;
   const { listings } = useGlobalContext();
   const listing = listings.find((listingItem) => listingItem.id === listingId);
+  const isCurrUser = listing.userId === auth.currentUser.uid;
+
   const handleLiked = () => {
     updateDoc(doc(db, `listings/${listing.id}`), {
       likedBy: listing.likedBy.includes(auth.currentUser.uid)
@@ -26,6 +28,8 @@ const ProductScreen = ({ route }) => {
         : arrayUnion(auth.currentUser.uid),
     });
   };
+
+  const handleEdit = () => {};
   return (
     <View style={styles.container}>
       <Image source={{ uri: listing.image }} style={styles.img} />
@@ -43,18 +47,28 @@ const ProductScreen = ({ route }) => {
       </CustomText>
       <CustomText style={styles.body}>Size: {listing.size}</CustomText>
       <View style={styles.btnContainer}>
-        <TouchableOpacity onPress={handleLiked} style={styles.likeBtn}>
-          <Icon
-            name="heart"
-            size={20}
-            color="#ffffff"
-            style={styles.imageIcon}
-            solid={listing.likedBy.includes(auth.currentUser.uid)}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buyBtn}>
-          <CustomText style={styles.btnText}>Buy • ${listing.price}</CustomText>
-        </TouchableOpacity>
+        {isCurrUser ? (
+          <TouchableOpacity onPress={handleEdit} style={styles.buyBtn}>
+            <CustomText style={styles.btnText}>Edit</CustomText>
+          </TouchableOpacity>
+        ) : (
+          <>
+            <TouchableOpacity onPress={handleLiked} style={styles.likeBtn}>
+              <Icon
+                name="heart"
+                size={20}
+                color="#222222"
+                style={styles.imageIcon}
+                solid={listing.likedBy.includes(auth.currentUser.uid)}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buyBtn}>
+              <CustomText style={styles.btnText}>
+                Buy • ${listing.price}
+              </CustomText>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
       <SafeAreaView />
     </View>
@@ -86,17 +100,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 8,
     backgroundColor: "#E1CFB9",
-    marginLeft: 20,
   },
   likeBtn: {
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 10,
     backgroundColor: "#E1CFB9",
+    marginRight: 20,
   },
   btnText: {
     fontSize: 18,
-    color: "#FFFFFF",
+    color: "#222222",
     textAlign: "center",
   },
   imageIcon: {

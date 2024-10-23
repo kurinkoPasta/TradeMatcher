@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: "#222222",
-    fontSize: 16,
+    fontSize: 18,
   },
   btn: {
     flexDirection: "row",
