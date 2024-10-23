@@ -15,8 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { collection, doc, getDocs } from "firebase/firestore";
 import { auth, db } from "../utils/firebase";
 import RNPickerSelect from "react-native-picker-select";
-
-const windowHalfWidth = Dimensions.get("window").width / 2;
+import Gallery from "../components/Gallery";
 
 const GalleryScreen = () => {
   const clothingTypeSize = {
@@ -59,9 +58,7 @@ const GalleryScreen = () => {
       );
     })();
   }, []);
-  const goToProduct = (listing) => {
-    navigation.navigate("Product", { listing });
-  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
@@ -121,19 +118,7 @@ const GalleryScreen = () => {
               ]}
             />
           </View>
-          <View style={styles.gallery}>
-            {listings.map((listing) => (
-              <TouchableOpacity
-                onPress={() => goToProduct(listing)}
-                key={listing.id}
-              >
-                <Image source={{ uri: listing.image }} style={styles.img} />
-                <CustomText style={styles.subheader}>
-                  ${listing.price} {listing.name}
-                </CustomText>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <Gallery listings={listings} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -143,10 +128,6 @@ const GalleryScreen = () => {
 export default GalleryScreen;
 
 const styles = StyleSheet.create({
-  img: {
-    width: windowHalfWidth,
-    height: windowHalfWidth,
-  },
   header: {
     color: "#000000",
     fontSize: 30,
@@ -170,12 +151,6 @@ const styles = StyleSheet.create({
     borderColor: "#EEEEEE",
     marginVertical: 10,
   },
-  subheader: {
-    fontSize: 16,
-    color: "#000000",
-    marginLeft: 10,
-    marginBottom: 5,
-  },
   filterContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -184,10 +159,6 @@ const styles = StyleSheet.create({
   imgContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  gallery: {
-    flexDirection: "row",
-    flexWrap: "wrap",
   },
   container: {
     flex: 1,
