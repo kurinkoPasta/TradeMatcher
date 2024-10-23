@@ -1,13 +1,20 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import React from "react";
 import CustomText from "../components/CustomText";
+import { useGlobalContext } from "../utils/context";
+import Gallery from "../components/Gallery";
+import { auth } from "../utils/firebase";
 
 const WishListScreen = () => {
+  const { listings } = useGlobalContext();
   return (
     <SafeAreaView>
-      <View>
-        <CustomText style={styles.header}>Wishlist</CustomText>
-      </View>
+      <CustomText style={styles.header}>Wishlist</CustomText>
+      <Gallery
+        listings={listings.filter((listingItem) =>
+          listingItem.likedBy.includes(auth.currentUser.uid)
+        )}
+      />
     </SafeAreaView>
   );
 };
